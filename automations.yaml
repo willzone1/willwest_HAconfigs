@@ -1,0 +1,393 @@
+- id: projector_on
+  alias: Projector on
+  trigger:
+  - entity_id: media_player.projector
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: light.living_room
+    state: 'on'
+  action:
+  - data:
+      entity_id: light.tall_boy,light.living_room_strip
+    service: light.turn_off
+- id: homekit_start
+  alias: Homekit start
+  trigger:
+  - event: start
+    platform: homeassistant
+  condition: []
+  action:
+  - data: {}
+    service: script.1555121161984
+- id: projector_off
+  alias: Projector off
+  trigger:
+  - entity_id: media_player.projector_boy
+    platform: state
+    to: 'off'
+  condition: []
+  action:
+  - data:
+      entity_id: media_player.projector
+    service: media_player.turn_off
+- id: roomba_while_out
+  alias: Roomba while out
+  trigger:
+  - entity_id: group.occupants
+    for: 00:15:00
+    from: home
+    platform: state
+    to: not_home
+  condition:
+  - after: sunrise
+    before: sunset
+    condition: sun
+  - condition: state
+    entity_id: input_boolean.vacuum_today
+    state: 'on'
+  action:
+  - data:
+      entity_id: vacuum.roomba
+    service: vacuum.turn_on
+  - data:
+      entity_id: input_boolean.vacuum_today
+    service: input_boolean.turn_off
+- id: vacuum_today_reset
+  alias: Vacuum today reset
+  trigger:
+  - at: 00:00:00
+    platform: time
+  condition:
+  - condition: time
+    weekday:
+    - sat
+    - sun
+  action:
+  - data:
+      entity_id: input_boolean.vacuum_today
+    service: input_boolean.turn_on
+- id: ATV_off
+  alias: ATV off
+  trigger:
+  - entity_id: media_player.tv
+    platform: state
+    to: 'off'
+  condition: []
+  action:
+  - data:
+      entity_id: media_player.bedroom_apple_tv
+    service: media_player.turn_off
+- id: living_room_off
+  alias: Living Room Off
+  trigger:
+  - entity_id: binary_sensor.living_room_motion_sensor
+    for: 00:25
+    platform: state
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: media_player.projector
+    state: 'off'
+  action:
+  - data:
+      entity_id: light.living_room,light.stringy_boy
+      transition: 20
+    service: light.turn_off
+  - data:
+      entity_id: switch.volcano
+    service: switch.turn_off
+- id: living_room_off_bedtime
+  alias: Living Room Off Bedtime
+  trigger:
+  - entity_id: binary_sensor.living_room_motion_sensor
+    for: 00:05
+    platform: state
+    to: 'off'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: media_player.projector
+      state: 'off'
+    - condition: or
+      conditions:
+      - after: sunset
+        condition: sun
+      - before: sunrise
+        condition: sun
+  action:
+  - data:
+      entity_id: light.living_room,light.stringy_boy
+      transition: 20
+    service: light.turn_off
+  - data:
+      entity_id: switch.volcano
+    service: switch.turn_off
+- id: living_room_dim
+  alias: Living Room Dim
+  trigger:
+  - at: '21:30:00'
+    platform: time
+  condition:
+  - condition: state
+    state: 'on'
+    entity_id: light.living_room
+#  - condition: time
+#    weekday:
+#    - sun
+#    - mon
+#    - tue
+#    - wed
+#    - thu
+  - condition: state
+    state: 'on'
+    entity_id: media_player.projector
+  action:
+  - data:
+      entity_id: light.couch_1,light.couch_2,light.couch_3,light.crunchy_boy
+      transition: 1800
+      brightness_pct: 70
+    service: light.turn_on
+- id: living_room_on_daytime
+  alias: Living Room On Daytime
+  trigger:
+  - entity_id: binary_sensor.living_room_motion_sensor
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition:
+  - after: sunrise
+    before: sunset
+    condition: sun
+  - condition: state
+    entity_id: light.living_room
+    state: 'off'
+  action:
+  - data:
+      brightness_pct: 100
+      entity_id: light.living_room
+      kelvin: 2700
+    service: light.turn_on
+- id: living_room_on_nighttime
+  alias: Living Room On Nighttime
+  trigger:
+  - entity_id: binary_sensor.living_room_motion_sensor
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: light.living_room
+      state: 'off'
+    - condition: or
+      conditions:
+      - after: sunset
+        condition: sun
+      - before: sunrise
+        condition: sun
+  action:
+  - data:
+      brightness_pct: 50
+      entity_id: light.living_room_only
+      kelvin: 1000
+    service: light.turn_on
+- id: roomba_success
+  alias: Roomba Success!
+  trigger:
+  - platform: template
+    value_template: is_state_attr("vacuum.roomba","status","Charging")
+  condition:
+  - condition: state
+    entity_id: group.occupants
+    state: away
+  action:
+    service: notify.ios_willphonex
+    data:
+      title: Roomba Success!
+      message: Roomba is Charging
+- id: bedtime_motion_on
+  alias: Bedtime Motion On
+  trigger:
+  - entity_id: binary_sensor.bedroom_motion_sensor
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+#      - condition: or
+#        conditions:
+    - before: sunrise
+      condition: sun
+#          - after: sunset
+#            condition: sun
+    - condition: state
+      entity_id: light.bedroom
+      state: 'off'
+    - condition: state
+      entity_id: light.living_room
+      state: 'off'
+  action:
+  - data:
+      brightness_pct: 5
+      entity_id: light.sleepy_boy
+      kelvin: 1000
+    service: light.turn_on
+- id: bedtime_motion_off
+  alias: Bedtime Motion Off
+  trigger:
+  - entity_id: binary_sensor.bedroom_motion_sensor
+    for: 00:00:30
+    from: 'on'
+    platform: state
+    to: 'off'
+  condition:
+  - before: sunrise
+    condition: sun
+  - condition: state
+    entity_id: light.sleepy_boy
+    state: 'on'
+  action:
+  - data:
+      entity_id: light.sleepy_boy
+      transition: 5
+    service: light.turn_off
+- id: kitchen_turns_living_room_off
+  alias: Kitchen Turns Living Room Off
+  trigger:
+  - entity_id: light.kitchen
+    for: 00:00:05
+    platform: state
+    from: 'on'
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: light.living_room_only
+    state: 'on'
+  action:
+  - data:
+      entity_id: light.living_room,light.stringy_boy
+#      transition: 20
+    service: light.turn_off
+  - data:
+      entity_id: switch.volcano
+    service: switch.turn_off
+- id: scene_1_tap
+  alias: Scene 1 tap
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 1
+      scene_data: 0
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: light.living_room
+      brightness_pct: 100
+      kelvin: 3500
+    service: light.turn_on
+- id: scene_1_hold
+  alias: Scene 1 hold
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 1
+      scene_data: 2
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: script.living_room_off
+    service: script.turn_on
+- id: scene_2_tap
+  alias: Scene 2 tap
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 2
+      scene_data: 0
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: script.living_room_projector
+    service: script.turn_on
+- id: scene_2_hold
+  alias: Scene 2 hold
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 2
+      scene_data: 2
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: script.living_room_colorloop_dim
+    service: script.turn_on
+- id: scene_3_tap
+  alias: Scene 3 tap
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 3
+      scene_data: 0
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: switch.volcano
+    service: switch.turn_on
+- id: scene_3_hold
+  alias: Scene 3 hold
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 3
+      scene_data: 2
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: switch.volcano
+    service: switch.turn_off
+- id: scene_4_tap
+  alias: Scene 4 tap
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 4
+      scene_data: 0
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: script.living_room_colorloop
+    service: script.turn_on
+- id: scene_4_hold
+  alias: Scene 4 hold
+  trigger:
+  - event_data:
+      entity_id: zwave.wallmote
+      scene_id: 4
+      scene_data: 2
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: script.living_room_colorloop_kitchen_off
+    service: script.turn_on

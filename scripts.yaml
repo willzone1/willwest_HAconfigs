@@ -1,0 +1,74 @@
+'1555121161984':
+  alias: Homekit start
+  sequence:
+  - delay: 0:03:00
+  - service: homekit.start
+living_room_off:
+  alias: Living Room Off
+  sequence:
+  - data:
+      entity_id: light.living_room_only
+      transition: 8
+    service: light.turn_off
+  - delay: '7'
+  - data:
+      entity_id: light.kitchen
+    service: light.turn_off
+living_room_colorloop_dim:
+  alias: Living Room Colorloop Dim
+  sequence:
+  - data:
+      brightness_pct: 100
+      effect: colorloop
+      entity_id: light.living_room_only
+    service: light.turn_on
+  - data:
+      entity_id: light.kitchen
+    service: light.turn_off
+  - condition: state
+    entity_id: media_player.projector
+    state: 'on'
+  - data:
+      entity_id: light.living_room_strip,light.tall_boy
+    service: light.turn_off
+  - data:
+      brightness_pct: 10
+      entity_id: light.couch
+    service: light.turn_on
+  - data:
+      brightness_pct: 30
+      entity_id: light.crunchy_boy
+    service: light.turn_on
+living_room_projector:
+  alias: Living Room Projector
+  sequence:
+  - data:
+      entity_id: light.tall_boy,light.Living_room_strip
+    service: light.turn_off
+  - data:
+      brightness_pct: 50
+      effect: ''
+      entity_id: light.crunchy_boy,light.couch
+    service: light.turn_on
+living_room_colorloop:
+  alias: Living Room Colorloop
+  sequence:
+  - data:
+      brightness_pct: 100
+      effect: colorloop
+      entity_id: light.living_room_only
+    service: light.turn_on
+  - data:
+      entity_id: light.kitchen
+    service: light.turn_on
+living_room_colorloop_kitchen_off:
+  alias: Living Room Colorloop Kitchen Off
+  sequence:
+  - data:
+      brightness_pct: 100
+      effect: colorloop
+      entity_id: light.living_room_only
+    service: light.turn_on
+  - data:
+      entity_id: light.kitchen
+    service: light.turn_off

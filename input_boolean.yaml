@@ -1,0 +1,48 @@
+#  rainy_day:
+#    name: Rainy Day Lighting
+#    icon: mdi:water
+
+  media_lights:
+    name: Media Lighting
+    icon: mdi:filmstrip
+
+  away:
+    name: Away Vacation Mode
+    icon: mdi:map-marker
+
+  voice_greeting:
+    name: Audio Notifications
+    icon: mdi:speaker
+    
+  departure:
+    name: Depart and lock
+    icon: mdi:door-closed
+    
+  party_time:
+    name: Party Time
+    icon: mdi:cake-variant
+    
+  bedtime:
+    name: Bedtime
+    icon: mdi:hotel
+    
+  dog_walk:
+    name: Zero Midday Walk
+    icon: mdi:paw
+    initial: on
+
+  lights_out:
+    name: Lights Out
+    icon: mdi:lightbulb-outline
+    
+  occupancy:
+    name: Occupancy anyone home
+    icon: mdi:home
+
+#  bedroom_ac_thermostat:
+#    name: Bedroom AC Thermostat
+#    icon: mdi:thermometer-lines
+  
+  vacuum_today:
+    name: Vacuum Today
+    icon: mdi:robot-vacuum

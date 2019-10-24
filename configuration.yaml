@@ -1,0 +1,291 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: !secret home_name
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 0
+  # metric for Metric, imperial for Imperial
+  unit_system: imperial
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: !secret home_time_zone
+  # Customization file
+  customize: !include customize.yaml
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+cloud:
+    #alexa:
+      #filter:
+      #  include_entities:
+      #    - media_player.projector
+      #    - sensor.living_room_motion_burglar
+      #    - sensor.bedroom_motion_burglar
+      #  include_domains:
+      #    - binary_sensor
+      #    - input_boolean
+      #entity_config:
+      #  media_player.projector:
+      #    display_categories: TV
+      #  binary_sensor.living_room_motion_sensor:
+      #    display_categories: ACTIVITY_TRIGGER
+      #  binary_sensor.bedroom_motion_sensor:
+      #    display_categories: ACTIVITY_TRIGGER
+      #  sensor.living_room_motion_burglar:
+      #    display_categories: MOTION_SENSOR
+      #  sensor.bedroom_motion_burglar:
+      #    display_categories: MOTION_SENSOR
+          
+
+
+# Show the introduction message on startup.
+#introduction:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+http:
+  base_url: !secret http_base_url
+  
+recorder:
+  exclude:
+    domains:
+      - updater
+    entities:
+      - sensor.bedroom_motion_alarm_level
+      - sensor.bedroom_motion_alarm_type
+      - sensor.bedroom_motion_power_management
+      - sensor.bedroom_motion_sourcenodeid
+      - sensor.living_room_motion_alarm_level
+      - sensor.living_room_motion_alarm_type
+      - sensor.living_room_motion_power_management
+      - sensor.living_room_motion_sourcenodeid
+    
+
+logbook:
+  include:
+    entities:
+      - light.living_room
+      - switch.volcano
+      - light.bedroom
+      - light.stringy_boy
+      - vacuum.roomba
+      - media_player.tv
+      - media_player.projector
+      - media_player.projector_boy
+      - media_player.bedroom_apple_tv
+      - group.occupants
+      - sun.sun
+    domains:
+      - automation
+      - binary_sensor
+      - device_tracker
+      
+      
+
+history:
+  include:
+    entities:
+      - light.living_room
+      - switch.volcano
+      - light.bedroom
+      - light.stringy_boy
+      - vacuum.roomba
+      - media_player.tv
+      - media_player.projector
+      - media_player.projector_boy
+      - media_player.bedroom_apple_tv
+      - group.occupants
+      - sun.sun
+    domains:
+      - binary_sensor
+      - sensor
+      - device_tracker
+
+hacs:
+  token: !secret hacs_token
+
+apple_tv:
+  - host: !secret apple_tv_host
+    login_id: !secret apple_tv_login
+    name: Bedroom Apple TV
+    start_off: true
+    credentials: !secret apple_tv_credentials
+
+media_player:
+  - platform: epson
+    host: !secret epson_host
+    name: "Projector"
+  - platform: webostv
+    host: !secret webostv_host
+    name: "TV"
+    customize:
+      sources:
+        - plex
+        - netflix
+        - amazon
+        - youtube
+        - hdmi1
+        - av1
+  - platform: androidtv
+    name: Projector Boy
+    host: androidtv_host
+    #adb_server_ip: !secret androidtv_adb_server_ip
+    #adb_server_port: !secret androidtv_adb_server_port
+    adbkey: !secret androidtv_adbkey
+        
+homekit:
+  auto_start: false
+  filter:
+    include_entities:
+      - switch.volcano
+      - light.stringy_boy
+      - media_player.projector
+      - media_player.projector_boy
+      - media_player.tv
+  entity_config:
+    switch.volcano:
+      type: outlet
+    media_player.projector:
+      feature_list:
+        - feature: on_off
+        #- feature: play_pause
+        #- feature: play_stop
+        #- feature: toggle_mute
+    media_player.projector_boy:
+      feature_list:
+        #- feature: on_off
+        - feature: play_pause
+        #- feature: play_stop
+        #- feature: toggle_mute
+    media_player.tv:
+      feature_list:
+        - feature: on_off
+
+zone:
+  - name: !secret g_name
+    latitude: !secret g_latitude
+    longitude: !secret g_longitude
+    radius: 500
+    icon: mdi:briefcase
+
+hue:
+  bridges:
+    - host: !secret hue_host
+      allow_hue_groups: false
+      allow_unreachable: true
+
+#august:
+#  login_method: phone
+#  username: !secret august_username
+#  password: !secret august_password
+
+ios:
+#  push:
+#    categories:
+#      - name: Lock
+#        identifier: 'lock'
+#        actions:
+#          - identifier: 'LOCK_DOOR'
+#            title: 'Lock Door'
+#            activationMode: 'background'
+#            authenticationRequired: yes
+#            destructive: yes
+#            behavior: 'default'
+#      - name: Unlock
+#        identifier: 'unlock'
+#        actions:
+#          - identifier: 'UNLOCK_DOOR'
+#            title: 'Unlock Door'
+#            activationMode: 'background'
+#            authenticationRequired: yes
+#            destructive: yes
+#            behavior: 'default'
+
+# Sensors
+sensor:
+  # Weather prediction
+  - platform: yr
+
+# Text to speech
+tts:
+  - platform: google_translate
+    service_name: google_say
+  
+wemo:
+#  discovery: false
+  static:
+    - !secret wemo_1
+    - !secret wemo_2
+
+light:
+  - platform: switch
+    name: Kitchen
+    entity_id: switch.kitchen_lights
+  - platform: switch
+    name: Stringy Boy
+    entity_id: switch.stringy_boy
+  - platform: group
+    name: Living Room
+    entities:
+      - light.couch_1
+      - light.couch_2
+      - light.couch_3
+      - light.crunchy_boy
+      - light.living_room_strip
+      - light.tall_boy
+      - light.kitchen
+  - platform: group
+    name: Living Room Only
+    entities:
+      - light.couch_1
+      - light.couch_2
+      - light.couch_3
+      - light.crunchy_boy
+      - light.living_room_strip
+      - light.tall_boy
+  - platform: group
+    name: Couch
+    entities:
+      - light.couch_1
+      - light.couch_2
+      - light.couch_3
+  - platform: group
+    name: Bedroom
+    entities:
+      - light.bedroom_strip
+      - light.sleepy_boy
+    
+tplink:
+  switch:
+    - host: !secret tplink_host_1
+
+device_tracker:
+  - platform: bluetooth_tracker
+#  - platform: tplink
+#    host: !secret hannahfi_host
+#    username: !secret hannahfi_username
+#    password: !secret hannahfi_password
+#notify:
+#  - platform: nfandroidtv
+#    name: Projector Boy
+#    host: !secret androidtv_host
+
+camera:
+  - platform: mjpeg
+    mjpeg_url: !secret camera_mjpeg_url
+    name: !secret camera_name
+    
+vacuum:
+  - platform: roomba
+    host: !secret roomba_host
+    username: !secret roomba_username
+    password: !secret roomba_password
+
+# Discover some devices automatically
+#discovery:
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+input_boolean: !include input_boolean.yaml
